@@ -1,113 +1,134 @@
 #!/bin/bash
 
-# Check for required arguments
-if [[ $# -lt 3 ]]; then
-    echo "Usage: $0 <k1> <k2> <function (f1|f2|f3)> <n_values (space-separated)>" >&2
+# Check input arguments
+if [ $# -lt 3 ]; then
+    echo "Usage: $0 k function_type n1 [n2 ...]"
     exit 1
 fi
 
-# Parse input arguments
-k1=$1
-k2=$2
-func_type=$3
-shift 3
+k=$1
+function_type=$2
+shift 2
 n_values=("$@")
 
-# Start total timer
-total_start=$(date +%s)
+# Start overall timing
+start_time=$(date +%s)
 
-# Compile the program using make
-echo "Compiling program..." >&2
-compile_start=$(date +%s)
-if ! make; then
-    echo "Compilation failed. Please check for errors in your source code." >&2
+echo "Starting the Monte Carlo integration script..."
+echo "k = $k"
+echo "Function type = $function_type"
+echo "n values = ${n_values[@]}"
+
+# Compile the program
+echo "Compiling the program..."
+make clean
+make
+if [ $? -ne 0 ]; then
+    echo "Compilation failed."
     exit 1
 fi
-compile_end=$(date +%s)
-echo "Compilation completed in $((compile_end - compile_start)) seconds." >&2
+echo "Compilation finished."
 
-# Set exact value for the function
-case "$func_type" in
-    "f1") exact_value=12 ;;
-    "f2") exact_value=2 ;;
-    "f3") exact_value=0.4 ;;
-    *) echo "Unknown function type" >&2; exit 1 ;;
-esac
+# Prepare data files
+data_points_file="data_points.dat"
+mean_values_file="mean_values.dat"
+rm -f $data_points_file $mean_values_file
 
-# Function to run experiments and save mean results for a given k
-run_experiment() {
-    local k=$1
-    local n=$2
-    local results=()
+# Counter for progress indicator
+total_n=${#n_values[@]}
+current_n=1
 
-    # Debug message for the start of an experiment
-    echo "Running experiment for n=$n with k=$k repetitions..." >&2
-    exp_start=$(date +%s)
-
-    # Run the Monte Carlo simulation `k` times and collect results
-    for ((i = 0; i < k; i++)); do
-        result=$(./montecarlo "$k" "$n" "$func_type" | awk 'NR==2 {print $2}')
-        results+=("$result")
-    done
-
-    # Calculate mean
-    mean=$(echo "${results[@]}" | awk '{sum=0; for(i=1;i<=NF;i++) sum+=$i; print sum/NF}')
-    # Output the data line: n, mean, and individual results (for the .dat file)
-    echo "$n $mean ${results[@]}"
-
-    # Debug message for the end of an experiment
-    exp_end=$(date +%s)
-    echo "Experiment for n=$n completed in $((exp_end - exp_start)) seconds." >&2
-}
-
-# Prepare data files for gnuplot
-data_file_k1="${func_type}_data_k1.dat"
-data_file_k2="${func_type}_data_k2.dat"
-> "$data_file_k1"
-> "$data_file_k2"
-
-# Run experiments for each `n` and store results in separate files for k1 and k2
-data_gen_start=$(date +%s)
 for n in "${n_values[@]}"; do
-    run_experiment "$k1" "$n" >> "$data_file_k1"
-    run_experiment "$k2" "$n" >> "$data_file_k2"
-done
-data_gen_end=$(date +%s)
-echo "Data generation completed in $((data_gen_end - data_gen_start)) seconds." >&2
+    echo "Processing n=$n ($current_n of $total_n)..."
+    temp_file="temp_$n.dat"
 
-# Generate plots with gnuplot
-plot_start=$(date +%s)
-for k in "$k1" "$k2"; do
-    data_file="${func_type}_data_k${k}.dat"
-    output_file="plot_${func_type}_k${k}.png"
+    # Start timing for this n
+    n_start_time=$(date +%s)
 
-    # Check if data file exists and has content
-    if [[ ! -s "$data_file" ]]; then
-        echo "Error: Data file $data_file is empty or missing." >&2
+    # Run the Monte Carlo program
+    ./montecarlo $k $n $function_type > $temp_file
+
+    # Check if execution was successful
+    if [ $? -ne 0 ]; then
+        echo "Execution failed for n=$n."
         exit 1
     fi
 
-    echo "Generating plot for k=$k..." >&2
+    # Extract calka values
+    grep -v '^#' $temp_file | awk 'NF==2 {print $1, $2}' >> $data_points_file
 
-    gnuplot <<-EOF
-        set title "Monte Carlo Integration for ${func_type} (k=${k})"
-        set xlabel "n (Number of Points)"
-        set ylabel "Approximate Integral"
-        set key left
-        set term pngcairo size 800,600
-        set output "${output_file}"
+    # Extract mean value
+    mean_line=$(grep -v '^#' $temp_file | awk 'NF==3 {print $1, $2}')
+    echo $mean_line >> $mean_values_file
 
-        # Plot individual approximations as blue points, mean as red points, and exact value line
-        plot "${data_file}" using 1:3 with points pointtype 7 pointsize 0.5 lc rgb "blue" title "Individual Approximations", \
-             "${data_file}" using 1:2 with points pointtype 7 pointsize 1 lc rgb "red" title "Mean Approximation", \
-             ${exact_value} with lines lc rgb "green" title "Exact Value"
+    rm $temp_file
+
+    # End timing for this n
+    n_end_time=$(date +%s)
+    n_duration=$((n_end_time - n_start_time))
+    echo "Finished n=$n in $n_duration seconds."
+
+    current_n=$((current_n + 1))
+done
+
+# Determine exact value (dokladnaWartosc)
+case $function_type in
+    f1)
+        dokladnaWartosc=12
+        ;;
+    f2)
+        dokladnaWartosc=2
+        ;;
+    f3)
+    dokladnaWartosc=0.421875
+        ;;
+    pi)
+        dokladnaWartosc=3.1415926536
+        ;;
+    *)
+        echo "Invalid function type: $function_type"
+        exit 1
+        ;;
+esac
+
+# Prepare gnuplot script
+echo "Preparing gnuplot script..."
+gnuplot_script="plot.gnuplot"
+
+# Define the output plot filename
+plot_filename="plot_${function_type}_${k}.png"
+
+cat > $gnuplot_script << EOF
+set terminal png size 800,600
+set output '$plot_filename'
+set xlabel 'n'
+set ylabel 'Integral Value'
+set title 'Monte Carlo Integration (Function: $function_type, k: $k)'
+set key left top
+set style line 1 lc rgb 'blue' pt 7 ps 0.5
+set style line 2 lc rgb 'red' pt 7 ps 1.5
+set style line 3 lc rgb 'green' lt 1 lw 2
+
+plot \
+    '$data_points_file' using 1:2 notitle with points ls 1, \
+    '$mean_values_file' using 1:2 title 'Mean Value' with points ls 2, \
+    $dokladnaWartosc title 'Exact Value' with lines ls 3
 EOF
 
-    echo "Plot for k=$k saved as ${output_file}." >&2
-done
-plot_end=$(date +%s)
-echo "Plot generation completed in $((plot_end - plot_start)) seconds." >&2
+# Run gnuplot
+echo "Generating plot with gnuplot..."
+gnuplot $gnuplot_script
+if [ $? -ne 0 ]; then
+    echo "Gnuplot failed."
+    exit 1
+fi
+echo "Plot generated as $plot_filename."
 
-# End total timer
-total_end=$(date +%s)
-echo "Total script execution time: $((total_end - total_start)) seconds." >&2
+# Clean up temporary files
+echo "Cleaning up temporary files..."
+rm $data_points_file $mean_values_file $gnuplot_script
+
+# End overall timing
+end_time=$(date +%s)
+total_duration=$((end_time - start_time))
+echo "Script completed in $total_duration seconds."

@@ -8,27 +8,34 @@
 double (*wybierzFunkcje(const std::string &typ, double &a, double &b, double &M, double &dokladnaWartosc)) (double) {
     if(typ == "f1"){
         //podpunkt a:
-        a=0;
-        b=8;
-        M=2;
-        dokladnaWartosc=12;
+        a=0.0;
+        b=8.0;
+        M=2.0;
+        dokladnaWartosc=12.0;
         return f1;
     } else if (typ == "f2"){
         //podpunkt b:
-        a=0;
+        a=0.0;
         b=M_PI;
-        M=1;
-        dokladnaWartosc=2;
+        M=1.0;
+        dokladnaWartosc=2.0;
         return f2;
     } else if (typ == "f3"){
         //podpunkt c:
-        a=0;
-        b=1;
-        M=4.0/27.0;
-        dokladnaWartosc=2.0/5.0;
+        a=0.0;
+        b=1.0;
+        M=27.0/64.0;
+        dokladnaWartosc=0.2;
         return f3;
+    } else if (typ == "pi"){
+        //zagadnienie liczenia pi:
+        a=0.0;
+        b=1.0;
+        M=4.0;
+        dokladnaWartosc=M_PI;
+        return f_pi;
     } else {
-        std::cerr<<"nie prawidlowe uzycie: f1, f2 lub f3."<<std::endl;
+        std::cerr<<"nie prawidlowe uzycie: f1, f2, f3 lub pi."<<std::endl;
         exit(1);
     }
 }
@@ -46,9 +53,6 @@ int main(int argc, char* argv[]){
 
     double a, b, M, dokladnaWartosc;
     double (*f)(double) = wybierzFunkcje(typ, a, b, M, dokladnaWartosc);
-
-    //header gnu plota
-    std::cout<<"# n     Przyblizenie    Srednia     DokladnaWartosc"<<std::endl;
 
     std::vector<double> wyniki;
     for(int i=0; i<k; i++){
@@ -96,4 +100,7 @@ double f2(double x){
 }
 double f3(double x){
     return 4*x*std::pow(1-x, 3);
+}
+double f_pi(double x){
+    return 4.0/(1.0+x*x);
 }
