@@ -117,3 +117,12 @@ bash run.sh 5 50 pi $(seq 1000 1000 10000)
   ```bash
   chmod +x run.sh
   ```
+- Zależności: Upewnij się, że masz zainstalowany `gnuplot` oraz kompilator C++.
+
+  ## Kontakt
+
+Jeśli masz pytania lub napotkasz problemy, skontaktuj się z autorem projektu.
+
+---
+
+**Uwaga**: Przed uruchomieniem programu upewnij się, że wszystkie wymagane narzędzia są zainstalowane i skonfigurowane poprawnie. Jeśli napotkasz problemy, sprawdź konfigurację środowiska lub skonsultuj się z dokumentacją narzędzi.
