@@ -5,7 +5,7 @@
 #include <vector>
 #include "header.cpp"
 
-double (*wybierzFunkcje(const std::string &typ, double &a, double &b, double &M, double dokladnaWartosc)) (double) {
+double (*wybierzFunkcje(const std::string &typ, double &a, double &b, double &M, double &dokladnaWartosc)) (double) {
     if(typ == "f1"){
         //podpunkt a:
         a=0;
@@ -24,7 +24,7 @@ double (*wybierzFunkcje(const std::string &typ, double &a, double &b, double &M,
         //podpunkt c:
         a=0;
         b=1;
-        M=3;
+        M=4.0/27.0;
         dokladnaWartosc=2.0/5.0;
         return f3;
     } else {
@@ -84,7 +84,7 @@ double monteCarloCalka(double (*f)(double), double a, double b, double M, int n)
     }
     //z polecenia
     double pole=(b-a)*M;
-    return (double)(C/n)*pole;
+    return (static_cast<double>(C)/n)*pole;
 }
 
 //definicje funkcji:
