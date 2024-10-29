@@ -1,0 +1,31 @@
+#!bin/bash
+
+#sposob uzycia
+if [ $# -lt 3 ]; then
+    echo "Uzycie: k, funkcja, wartosc n po przecinkach"
+    exit 1
+fi
+
+#przyjecie argsow:
+k=$1
+typ=$2
+
+#cala reszta
+shift 2
+n_wartosci=("$@")
+
+echo "czyszczenie"
+make clean
+echo "czyszcenie zakonczone, kompilacja"
+make
+
+#odpalenie eksperymentu:
+for n in "${n_wartosci[@]}"; do
+    echo "odpalam symulacje dla ${typ} z n=${n} i k=${k}..."
+    startTime=$(date +%s)
+    ./montecarlo $k $n $typ > data_${typ}_n${n}.dat
+
+    #gnu plot...
+
+    gnuplot  <<-EOF
+        set title "Liczenie calki z pomoca metody Monte Carlo dla ${typ} z
