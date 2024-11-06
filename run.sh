@@ -80,7 +80,7 @@ case $function_type in
         dokladnaWartosc=2
         ;;
     f3)
-    dokladnaWartosc=0.421875
+        dokladnaWartosc=0.2
         ;;
     pi)
         dokladnaWartosc=3.1415926536
@@ -102,8 +102,8 @@ cat > $gnuplot_script << EOF
 set terminal png size 800,600
 set output '$plot_filename'
 set xlabel 'n'
-set ylabel 'Integral Value'
-set title 'Monte Carlo Integration (Function: $function_type, k: $k)'
+set ylabel 'Wynik calkowania'
+set title 'Monte Carlo calkowanie (fukncja: $function_type, k: $k)'
 set key left top
 set style line 1 lc rgb 'blue' pt 7 ps 0.5
 set style line 2 lc rgb 'red' pt 7 ps 1.5
@@ -111,8 +111,8 @@ set style line 3 lc rgb 'green' lt 1 lw 2
 
 plot \
     '$data_points_file' using 1:2 notitle with points ls 1, \
-    '$mean_values_file' using 1:2 title 'Mean Value' with points ls 2, \
-    $dokladnaWartosc title 'Exact Value' with lines ls 3
+    '$mean_values_file' using 1:2 title 'srednie wartosci' with points ls 2, \
+    $dokladnaWartosc title 'dokladnaWartosc' with lines ls 3
 EOF
 
 # Run gnuplot
