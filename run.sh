@@ -80,7 +80,7 @@ case $function_type in
         dokladnaWartosc=2
         ;;
     f3)
-    dokladnaWartosc=0.421875
+        dokladnaWartosc=0.2
         ;;
     pi)
         dokladnaWartosc=3.1415926536

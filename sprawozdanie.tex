@@ -1,0 +1,93 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{polski}
+\usepackage[utf8]{inputenc}
+
+\title{Eksperymenty z całkowaniem Monte Carlo}
+\author{Jakub Kogut}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section{Wstęp}
+Sprawozdanie do zadania domowego 1.
+
+\section{Opis Zadania}
+Dane są następujące całki, które należy przybliżyć:
+\begin{itemize}
+    \item \( \int_{0}^{8} 3 \sqrt{x} \, dx \)
+    \item \( \int_{0}^{\pi} \sin(x) \, dx \)
+    \item \( \int_{0}^{1} 4x(1 - x)^3 \, dx \)
+\end{itemize}
+
+Dla każdej z tych całek przeprowadzono eksperymenty, wykonując algorytm Monte Carlo dla \( n = 50, 100, \ldots, 5000 \) z \( k = 5 \) oraz \( k = 50 \) niezależnymi powtórzeniami. Eksperymenty obejmowały również aproksymację liczby \(\pi\) przy użyciu tej samej metody Monte Carlo.
+
+\section{Metodologia}
+Metoda całkowania Monte Carlo została przeprowadzona w następujący sposób:
+\begin{enumerate}
+    \item Generowano losowe punkty w obrębie prostokąta obejmującego wykres funkcji całkowanej.
+    \item Zliczano punkty, które znalazły się pod wykresem funkcji.
+    \item Stosunek punktów pod wykresem do całkowitej liczby punktów użyto do oszacowania wartości całki.
+\end{enumerate}
+
+\section{Wyniki}
+Wyniki eksperymentów przedstawiono na poniższych wykresach, gdzie:
+\begin{itemize}
+    \item Niebieskie punkty reprezentują wyniki poszczególnych powtórzeń.
+    \item Czerwone kropki przedstawiają średnią wartość dla każdego \( n \).
+    \item Zielona linia oznacza dokładną wartość całki lub \(\pi\).
+\end{itemize}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{plot_f1_5.png}
+    \caption{Całka \( \int_{0}^{8} 3 \sqrt{x} \, dx \) dla \(k = 5\) powtórzeń}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{plot_f1_50.png}
+    \caption{Całka \( \int_{0}^{8} 3 \sqrt{x} \, dx \) dla \(k = 50\) powtórzeń}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{plot_f2_5.png}
+    \caption{Całka \( \int_{0}^{\pi} \sin(x) \, dx \) dla \(k = 5\) powtórzeń}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{plot_f2_50.png}
+    \caption{Całka \( \int_{0}^{\pi} \sin(x) \, dx \) dla \(k = 50\) powtórzeń}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{plot_f3_5.png}
+    \caption{Całka \( \int_{0}^{1} 4x(1 - x)^3 \, dx \) dla \(k = 5\) powtórzeń}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{plot_f3_50.png}
+    \caption{Całka \( \int_{0}^{1} 4x(1 - x)^3 \, dx \) dla \(k = 50\) powtórzeń}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{plot_pi_50.png}
+    \caption{Aproksymacja liczby \(\pi\) dla \(k = 50\) powtórzeń}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{plot_pi_5.png}
+    \caption{Aproksymacja liczby \(\pi\) dla \(k = 5\) powtórzeń}
+\end{figure}
+
+
+\end{document}
