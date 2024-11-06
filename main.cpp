@@ -1,10 +1,8 @@
-//main.cpp
 #include <iostream>
 #include <cmath>
 #include <random>
 #include <vector>
 #include <string>
-// Function declarations (assuming they are in "header.cpp" or defined elsewhere)
 double monteCarloCalka(double (*f)(double), double a, double b, double M, int n);
 double f1(double x);
 double f2(double x);
